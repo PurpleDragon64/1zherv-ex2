@@ -52,3 +52,6 @@ crashlytics-build.properties
 
 # Macbook
 .DS_Store
+
+# Build folder
+Ex2/

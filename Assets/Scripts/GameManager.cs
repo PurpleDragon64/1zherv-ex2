@@ -12,7 +12,12 @@ public class GameManager : MonoBehaviour
     /// GameObject used for the start text.
     /// </summary>
     public GameObject startText;
-    
+
+    /// <summary>
+    /// GameObject used for the loss text.
+    /// </summary>
+    public GameObject winText;
+
     /// <summary>
     /// GameObject used for the loss text.
     /// </summary>
@@ -37,6 +42,11 @@ public class GameManager : MonoBehaviour
     /// Current accumulated score.
     /// </summary>
     private float mCurrentScore = 0.0f;
+
+    /// <summary>
+    /// Is the game lost?
+    /// </summary>
+    public bool mGameWon = false;
 
     /// <summary>
     /// Is the game lost?
@@ -93,12 +103,16 @@ public class GameManager : MonoBehaviour
         if (Input.GetButtonDown("Cancel"))
         { ResetGame(); }
 
-        if (sGameStarted && !mGameLost)
+        if (sGameStarted && !mGameWon && !mGameLost)
         {
             // Increment the score by elapsed time.
             mCurrentScore += Time.deltaTime;
             // Update the score text.
             GetChildNamed(scoreText, "Value").GetComponent<Text>().text = $"{(int)(mCurrentScore)}";
+            if (mCurrentScore >= 10)
+            {
+                WinGmae();
+            }
         }
     }
 
@@ -131,6 +145,7 @@ public class GameManager : MonoBehaviour
         }
         
         // Set the state.
+        mGameWon = false;
         mGameLost = false;
     }
 
@@ -151,6 +166,23 @@ public class GameManager : MonoBehaviour
     {
         // Reload the active scene, triggering reset...
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    /// <summary>
+    /// Set the game to the "won" state.
+    /// </summary>
+    public void WinGmae()
+    {
+        // Get the spawner script.
+        var sp = spawner.GetComponent<Spawner>();
+        // Stop the obstacles.
+        //sp.ModifyObstacleSpeed(0.0f);
+        // Stop spawning.
+        sp.spawnObstacles = false;
+        // Show the loss text.
+        winText.SetActive(true);
+        // Loose the game.
+        mGameWon = true;
     }
 
     /// <summary>

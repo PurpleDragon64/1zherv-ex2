@@ -98,6 +98,11 @@ public class Player : MonoBehaviour
     /// Current state of gravity - 1.0 for down, -1.0f for up.
     /// </summary>
     private float mCurrentGravity = 1.0f;
+
+    /// <summary>
+    /// Instance of Game Manager
+    /// </summary>
+    private GameManager gm;
     
     /// <summary>
     /// Called before the first frame update.
@@ -109,6 +114,7 @@ public class Player : MonoBehaviour
         mSpriteRenderer = gameObject.transform.GetChild(0).GetComponent<SpriteRenderer>();
         mSpriteTransform = gameObject.transform.GetChild(0).GetComponent<Transform>();
         mTargetRotation = mSpriteTransform.rotation;
+        gm = GameManager.Instance;
     }
 
     /// <summary>
@@ -143,6 +149,12 @@ public class Player : MonoBehaviour
                 rotateAxis.z && mCurrentGravity > 0.0f ? 180.0f : 0.0f
             ) * axisDirection);
             mSwitchedGravity = true;
+        }
+
+        // Make Player happy if game is won
+        if (gm.mGameWon)
+        {
+            mSpriteRenderer.sprite = spriteHappy;
         }
     }
 
@@ -193,16 +205,19 @@ public class Player : MonoBehaviour
         
         if (hitObstacle)
         { // If we collide with any obstacle -> end the game.
-            // Update the sprite.
-            mSpriteRenderer.sprite = spriteSad; 
-            // Move to the uncollidable layer.
-            gameObject.layer = LayerMask.NameToLayer("Uncollidable");
-            // Fling the obstacle out of the screen.
-            var otherRB = other.gameObject.GetComponent<Rigidbody2D>();
-            other.gameObject.layer = LayerMask.NameToLayer("Uncollidable");
-            otherRB.velocity = -Physics.gravity;
-            // Loose the game.
-            GameManager.Instance.LooseGame();
+            if (!gm.mGameWon) // Cannot lose after win
+            {
+                // Update the sprite.
+                mSpriteRenderer.sprite = spriteSad; 
+                // Move to the uncollidable layer.
+                gameObject.layer = LayerMask.NameToLayer("Uncollidable");
+                // Fling the obstacle out of the screen.
+                var otherRB = other.gameObject.GetComponent<Rigidbody2D>();
+                other.gameObject.layer = LayerMask.NameToLayer("Uncollidable");
+                otherRB.velocity = -Physics.gravity;
+                // Loose the game.
+                gm.LooseGame();
+            }
         }
     }
 }

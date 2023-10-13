@@ -109,7 +109,7 @@ public class GameManager : MonoBehaviour
             mCurrentScore += Time.deltaTime;
             // Update the score text.
             GetChildNamed(scoreText, "Value").GetComponent<Text>().text = $"{(int)(mCurrentScore)}";
-            if (mCurrentScore >= 10)
+            if (mCurrentScore >= 100)
             {
                 WinGmae();
             }
